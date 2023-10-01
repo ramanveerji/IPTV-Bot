@@ -46,18 +46,21 @@ ROWS = 15
 def tvname(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
 
     search = message.text
-    tvs = [InlineKeyboardButton(text = x.get("name",x["channel"]),
-                                web_app=WebAppInfo(url = STREAM_LINK + "?url=" + x["url"]))
-                                for x in STREAMS if search.lower() in x.get("name",x["channel"]).lower()]
-    
+    tvs = [
+        InlineKeyboardButton(
+            text=x.get("name", x["channel"]),
+            web_app=WebAppInfo(url=f"{STREAM_LINK}?url=" + x["url"]),
+        )
+        for x in STREAMS
+        if search.lower() in x.get("name", x["channel"]).lower()
+    ]
+
     print("Total Results for",search,"is",len(tvs))
-    if len(tvs) == 0:
+    if not tvs:
         app.send_message(message.chat.id,"No Results Found",reply_to_message_id=message.id)
         return
-    
-    main = []
-    for i in range(0, len(tvs), COLMS): main.append(tvs[i:i+COLMS])
-    
+
+    main = [tvs[i:i+COLMS] for i in range(0, len(tvs), COLMS)]
     app.send_message(message.chat.id, '__Click on any one Channel__',
     reply_to_message_id=message.id, reply_markup=InlineKeyboardMarkup(main[:ROWS]))
 
